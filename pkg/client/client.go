@@ -8,7 +8,6 @@ import (
 )
 
 type Client struct {
-
 }
 
 func (s *Client) Call(address *string,port *string) error {
@@ -18,23 +17,25 @@ func (s *Client) Call(address *string,port *string) error {
 	if err != nil{
 		return err
 	}
+	go s.handleServerMessages(conn)
 	for {
 		reader:=bufio.NewReader(os.Stdin)
 		text, err := reader.ReadString('\n')
+		if err != nil {
+			return err
+		}
 		fmt.Fprintf(conn,text+"\n")
+	}
+}
 
+
+func (s *Client) handleServerMessages(conn net.Conn) {
+	for {
 		message, err:= bufio.NewReader(conn).ReadString('\n')
 		fmt.Print("Message from server:"+message)
 
 		if err!=nil{
-			continue
-
+			break
 		}
-
 	}
-
-
-
-
-
 }
