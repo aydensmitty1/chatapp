@@ -43,6 +43,9 @@ func (s *Server) handle(conn net.Conn) {
 
 		message, err := bufio.NewReader(conn).ReadString('\n')
 		fmt.Println("Client:", message)
+		if err !=nil{
+			return
+		}
 
 		// for each connection in s.conns
 		// send the message to them
@@ -51,7 +54,7 @@ func (s *Server) handle(conn net.Conn) {
 
 			fmt.Fprintf(peerConn, message,s.conns)
 			if err != nil {
-				fmt.Println("there was an error forwarding message to peer")
+				//fmt.Println("there was an error forwarding message to peer")
 				continue
 			}
 		}

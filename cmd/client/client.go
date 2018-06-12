@@ -8,7 +8,8 @@ import (
 func main(){
 	port:=flag.String("port", "9992", "A port")
 	address:=flag.String("ipad","10.12.182.133", "an Ip address")
+	username:=flag.String("user", "John Doe", "A Username")
 	flag.Parse()
 	cli:= client.Client{}
-	cli.Call(address, port)
+	cli.Call(address, port, username)
 }
