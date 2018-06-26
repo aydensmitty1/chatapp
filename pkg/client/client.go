@@ -3,49 +3,53 @@ package client
 import (
 	"net"
 	"bufio"
-		"fmt"
+	"fmt"
 	"os"
-	"github.houston.softwaregrp.net/CSB/chatapp/pkg/message"
-	"encoding/json"
 	"time"
+	"encoding/json"
+	"github.houston.softwaregrp.net/CSB/chatapp/pkg/message"
+	"github.houston.softwaregrp.net/CSB/chatapp/pkg/clientregistration"
 )
 
 type Client struct {
 }
-func (s *Client) Call(address *string,port *string, username *string) {
+var messer struct {
+	message.Message
+}
+func (s *Client) Call(address *string, port *string, username *string, chatrm *string) {
 	addr := fmt.Sprintf("%s:%s", *address, *port)
 	fmt.Printf("dialing %s\n", addr)
 	conn, _ := net.Dial("tcp", addr)
-
-	go s.handleServerMessages(conn, username)
+	clientregistration.Clientreg(*chatrm, conn)
+	go s.handleServerMessages(conn)
 	for {
-		t:= time.Now()
-		x:=fmt.Sprintf(t.Format(time.UnixDate))
-		tx:=fmt.Sprintf("%s:", x)
+		t := time.Now()
+		x := fmt.Sprintf(t.Format(time.UnixDate))
+		tx := fmt.Sprintf("%s:", x)
 
 		reader := bufio.NewReader(os.Stdin)
 		text, _ := reader.ReadString('\n')
 		username := fmt.Sprint(*username)
+		chatroom := fmt.Sprintf(*chatrm)
+		msg := &message.Message {Author: username, Chatroom: chatroom, Time: tx, Text: text}
 
-		msg := &message.Message{username, tx, text}
-		S, err := json.Marshal(msg)
-
-		message.Decode(S)
-		fmt.Sprint(*msg)
-		fmt.Fprint(conn,msg)
+		jsonEncoder := json.NewEncoder(conn)
+		err := jsonEncoder.Encode(msg)
 		if err != nil {
-			continue
+			fmt.Println("error marshalling message")
+			fmt.Println(err)
 		}
 	}
 }
-func (s *Client) handleServerMessages(conn net.Conn, username *string) {
+func (s *Client) handleServerMessages(conn net.Conn) {
 	for {
-		message, err := bufio.NewReader(conn).ReadString('\n')
-		fmt.Println(message)
-		if err != nil {
+		jsonDecoder := json.NewDecoder(conn)
+		err := jsonDecoder.Decode(&messer)
+		fmt.Println(messer)
+		if err !=nil{
 			return
 		}
+
 	}
 
 }
-
