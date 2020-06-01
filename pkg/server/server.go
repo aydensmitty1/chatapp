@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"encoding/json"
 	"encoding/base64"
-		"github.houston.softwaregrp.net/CSB/chatapp/pkg/message"
+	"github.houston.softwaregrp.net/CSB/chatapp/pkg/message"
 	"github.houston.softwaregrp.net/CSB/chatapp/pkg/clientregistration"
 	)
 type Server struct {
